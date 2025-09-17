@@ -1,0 +1,183 @@
+{
+  "info": {
+    "name": "Video Editor API",
+    "description": "Collection for testing the Video Editor Backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "job_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/",
+          "host": ["{{base_url}}"],
+          "path": [""]
+        },
+        "description": "Check if the API server is running"
+      },
+      "response": []
+    },
+    {
+      "name": "2. Upload Video with Text Overlays",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    const response = pm.response.json();",
+              "    pm.collectionVariables.set('job_id', response.job_id);",
+              "    console.log('Job ID saved:', response.job_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "video",
+              "type": "file",
+              "src": "",
+              "description": "Select a video file to upload"
+            },
+            {
+              "key": "overlays",
+              "value": "[\n  {\n    \"type\": \"text\",\n    \"content\": \"Hello World!\",\n    \"x\": 0.1,\n    \"y\": 0.1,\n    \"start_time\": 2.0,\n    \"end_time\": 5.0,\n    \"width\": 0.3,\n    \"height\": 0.1,\n    \"font_size\": 24,\n    \"font_color\": \"white\",\n    \"background_color\": \"black\",\n    \"opacity\": 0.8\n  },\n  {\n    \"type\": \"text\",\n    \"content\": \"Overlay Text 2\",\n    \"x\": 0.5,\n    \"y\": 0.8,\n    \"start_time\": 3.0,\n    \"end_time\": 7.0,\n    \"font_size\": 32,\n    \"font_color\": \"yellow\"\n  }\n]",
+              "type": "text",
+              "description": "JSON array of overlay metadata"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/upload",
+          "host": ["{{base_url}}"],
+          "path": ["upload"]
+        },
+        "description": "Upload a video file with text overlay metadata"
+      },
+      "response": []
+    },
+    {
+      "name": "3. Upload Video with Mixed Overlays",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 200) {",
+              "    const response = pm.response.json();",
+              "    pm.collectionVariables.set('job_id', response.job_id);",
+              "    console.log('Job ID saved:', response.job_id);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "video",
+              "type": "file",
+              "src": "",
+              "description": "Select a video file to upload"
+            },
+            {
+              "key": "overlays",
+              "value": "[\n  {\n    \"type\": \"text\",\n    \"content\": \"Sample Title\",\n    \"x\": 0.1,\n    \"y\": 0.05,\n    \"start_time\": 1.0,\n    \"end_time\": 4.0,\n    \"font_size\": 36,\n    \"font_color\": \"white\",\n    \"background_color\": \"rgba(0,0,0,0.7)\"\n  },\n  {\n    \"type\": \"image\",\n    \"content\": \"/path/to/logo.png\",\n    \"x\": 0.8,\n    \"y\": 0.05,\n    \"start_time\": 0.0,\n    \"end_time\": 10.0,\n    \"width\": 0.15,\n    \"height\": 0.15,\n    \"opacity\": 0.9\n  },\n  {\n    \"type\": \"video\",\n    \"content\": \"/path/to/pip_video.mp4\",\n    \"x\": 0.7,\n    \"y\": 0.7,\n    \"start_time\": 2.0,\n    \"end_time\": 8.0,\n    \"width\": 0.25,\n    \"height\": 0.25\n  }\n]",
+              "type": "text",
+              "description": "JSON array with text, image, and video overlays"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/upload",
+          "host": ["{{base_url}}"],
+          "path": ["upload"]
+        },
+        "description": "Upload a video file with mixed overlay types (text, image, video)"
+      },
+      "response": []
+    },
+    {
+      "name": "4. Get Job Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/status/{{job_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["status", "{{job_id}}"]
+        },
+        "description": "Get the processing status of a video job. Use job_id from upload response."
+      },
+      "response": []
+    },
+    {
+      "name": "5. Download Processed Video",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/result/{{job_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["result", "{{job_id}}"]
+        },
+        "description": "Download the processed video file. Only works when job status is 'completed'."
+      },
+      "response": []
+    },
+    {
+      "name": "6. List All Jobs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/jobs",
+          "host": ["{{base_url}}"],
+          "path": ["jobs"]
+        },
+        "description": "List all jobs and their current statuses"
+      },
+      "response": []
+    },
+    {
+      "name": "7. Cleanup Job",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/cleanup/{{job_id}}",
+          "host": ["{{base_url}}"],
+          "path": ["cleanup", "{{job_id}}"]
+        },
+        "description": "Clean up files and data associated with a job"
+      },
+      "response": []
+    }
+  ]
+}
