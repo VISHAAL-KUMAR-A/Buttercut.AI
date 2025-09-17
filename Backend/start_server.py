@@ -7,6 +7,10 @@ import subprocess
 import sys
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 
 def check_python_version():
@@ -20,20 +24,41 @@ def check_python_version():
 
 def check_ffmpeg():
     """Check if ffmpeg is installed"""
+    # Get ffmpeg path from environment variable
+    ffmpeg_path = os.getenv('FFMPEG_PATH', 'ffmpeg')
+
+    try:
+        # Try using the configured path
+        result = subprocess.run([ffmpeg_path, '-version'],
+                                capture_output=True, text=True, timeout=10)
+        if result.returncode == 0:
+            print("✅ ffmpeg is installed")
+            version_line = result.stdout.split(
+                '\n')[0] if result.stdout else ''
+            version = version_line.split('ffmpeg version')[1].split(
+            )[0] if 'ffmpeg version' in version_line else 'Unknown'
+            print(f"   Version: {version}")
+            print(f"   Path: {ffmpeg_path}")
+            return True
+    except (subprocess.TimeoutExpired, FileNotFoundError, Exception) as e:
+        print(f"   Error with configured path ({ffmpeg_path}): {e}")
+
+    # Try fallback to system PATH
     try:
         result = subprocess.run(['ffmpeg', '-version'],
                                 capture_output=True, text=True, timeout=5)
         if result.returncode == 0:
-            print("✅ ffmpeg is installed")
+            print("✅ ffmpeg is installed (found in system PATH)")
             return True
-    except (subprocess.TimeoutExpired, FileNotFoundError):
+    except:
         pass
 
-    print("❌ ffmpeg is not installed or not in PATH")
-    print("Please install ffmpeg:")
-    print("  - Windows: https://ffmpeg.org/download.html")
-    print("  - macOS: brew install ffmpeg")
-    print("  - Linux: sudo apt-get install ffmpeg")
+    print("❌ ffmpeg is not found")
+    print("Please:")
+    print("  1. Install ffmpeg from: https://ffmpeg.org/download.html")
+    print(f"  2. Update the FFMPEG_PATH in your .env file")
+    print(f"     Current setting: FFMPEG_PATH={ffmpeg_path}")
+    print("  3. Or add ffmpeg to your system PATH")
     return False
 
 

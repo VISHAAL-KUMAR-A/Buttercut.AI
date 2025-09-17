@@ -5,8 +5,12 @@ import json
 from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 import logging
+from dotenv import load_dotenv
 
 from models import OverlayMetadata, JobStatus
+
+# Load environment variables
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -18,6 +22,13 @@ class VideoProcessor:
     def __init__(self):
         self.jobs: Dict[str, JobStatus] = {}
         self.processing_tasks: Dict[str, asyncio.Task] = {}
+
+        # Get ffmpeg and ffprobe paths from environment
+        self.ffmpeg_path = os.getenv('FFMPEG_PATH', 'ffmpeg')
+        self.ffprobe_path = os.getenv('FFPROBE_PATH', 'ffprobe')
+
+        logger.info(f"Using ffmpeg: {self.ffmpeg_path}")
+        logger.info(f"Using ffprobe: {self.ffprobe_path}")
 
     async def process_video(self, job_id: str, video_path: str, overlays: List[OverlayMetadata]) -> None:
         """Process video with overlays using ffmpeg"""
@@ -78,7 +89,7 @@ class VideoProcessor:
     async def _get_video_info(self, video_path: str) -> dict:
         """Get video information using ffprobe"""
         cmd = [
-            "ffprobe",
+            self.ffprobe_path,
             "-v", "quiet",
             "-print_format", "json",
             "-show_format",
@@ -231,7 +242,7 @@ class VideoProcessor:
     async def _execute_ffmpeg(self, input_path: str, output_path: str, filter_complex: str, job_id: str) -> None:
         """Execute ffmpeg command"""
         cmd = [
-            "ffmpeg",
+            self.ffmpeg_path,
             "-y",  # Overwrite output file
             "-i", input_path,
             "-filter_complex", filter_complex,

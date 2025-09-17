@@ -8,7 +8,7 @@ Before running the backend, make sure you have the following installed:
 
 1. **Python 3.8+**
 2. **ffmpeg** - Required for video processing
-   - Windows: Download from https://ffmpeg.org/download.html and add to PATH
+   - Windows: Download from https://ffmpeg.org/download.html
    - macOS: `brew install ffmpeg`
    - Linux: `sudo apt-get install ffmpeg`
 
@@ -28,12 +28,23 @@ Before running the backend, make sure you have the following installed:
    - Windows: `venv\Scripts\activate`
    - macOS/Linux: `source venv/bin/activate`
 
-4. **Install dependencies:**
+4. **Configure environment variables:**
+   ```bash
+   # Copy the example environment file
+   cp .env.example .env
+   
+   # Edit .env file and update the FFMPEG_PATH and FFPROBE_PATH
+   # Example for Windows:
+   # FFMPEG_PATH=C:\path\to\ffmpeg\bin\ffmpeg.exe
+   # FFPROBE_PATH=C:\path\to\ffmpeg\bin\ffprobe.exe
+   ```
+
+5. **Install dependencies:**
    ```bash
    pip install -r requirements.txt
    ```
 
-5. **Run the server:**
+6. **Run the server:**
    ```bash
    python main.py
    ```
@@ -42,10 +53,11 @@ Before running the backend, make sure you have the following installed:
    uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
 
-6. **Verify the server is running:**
+7. **Verify the server is running:**
    - Open http://localhost:8000 in your browser
    - You should see: `{"message": "Video Editor API is running", "timestamp": "..."}`
    - API documentation available at: http://localhost:8000/docs
+   - Check the console logs to ensure ffmpeg paths are detected correctly
 
 ## API Endpoints
 
@@ -227,6 +239,18 @@ The API includes comprehensive error handling for:
 - File system errors
 - ffmpeg execution errors
 
+## Environment Variables
+
+The application uses a `.env` file for configuration. Key variables include:
+
+- `FFMPEG_PATH`: Full path to ffmpeg executable
+- `FFPROBE_PATH`: Full path to ffprobe executable  
+- `HOST`: Server host (default: 0.0.0.0)
+- `PORT`: Server port (default: 8000)
+- `DEBUG`: Enable debug mode (default: True)
+- `MAX_UPLOAD_SIZE`: Maximum file upload size
+- `MAX_CONCURRENT_JOBS`: Maximum concurrent video processing jobs
+
 ## Notes
 
 - Videos are processed asynchronously in the background
@@ -235,3 +259,4 @@ The API includes comprehensive error handling for:
 - The API supports CORS for frontend integration
 - All timestamps are in seconds
 - Position coordinates are relative (0-1) to video dimensions
+- ffmpeg path is configurable via .env file (no system PATH required)
